@@ -61,7 +61,6 @@ group :development, :test do
   gem "rubocop-rails", require: false
   gem "rubocop-performance", require: false
   gem "brakeman", require: false
-  gem "rspec-rails"
 end
 
 group :development do
