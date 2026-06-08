@@ -1,3 +1,4 @@
+# KARLIS - From the looks of this file, it looks perfect so i will not touch it. Please use the docker compose, and Dockerfile.dev.
 # syntax=docker/dockerfile:1
 # check=error=true
 
