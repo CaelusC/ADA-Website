@@ -1,0 +1,62 @@
+version: '8.3.0'
+
+compose:
+  files:
+    - docker-compose.yml
+
+interaction:
+  up:
+    description: Start the app
+    compose:
+      method: up
+      run_options: [detach]
+
+  down:
+    description: Stop the app
+    compose:
+      method: down
+    subcommands:
+      volumes:
+        description: Stop and wipe the database
+        compose:
+          method: down
+          run_options: [volumes]
+
+  rails:
+    description: Run Rails commands
+    service: web
+    command: bundle exec rails
+
+  test:
+    description: Run tests
+    service: web
+    environment:
+      RAILS_ENV: test
+    command: bundle exec rails test
+
+  rubocop:
+    description: Run RuboCop linter
+    service: web
+    command: bundle exec rubocop
+    compose_run_options: [no-deps]
+    subcommands:
+      fix:
+        description: Auto-fix linting errors
+        command: bundle exec rubocop -a
+
+  brakeman:
+    description: Run security scan
+    service: web
+    command: bundle exec brakeman -q
+    compose_run_options: [no-deps]
+
+  bundle:
+    description: Run Bundler commands
+    service: web
+    command: bundle
+    compose_run_options: [no-deps]
+
+provision:
+  - cp -n .env.example .env || true
+  - dip compose build
+  - dip rails db:setup
