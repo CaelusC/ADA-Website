@@ -6,49 +6,92 @@ Built with Ruby on Rails 8, PostgreSQL 17, Tailwind CSS v4, ViewComponent, and H
 
 ## Setup
 
-Clone the repo:
+### Prerequisites
+
+You need **Docker** and **Ruby 3.3.6** installed locally (Ruby is required to run DIP).
+
+Check your Ruby version:
+
+```bash
+ruby -v
+```
+
+If you don't have Ruby 3.3.6, install it with [rbenv](https://github.com/rbenv/rbenv):
+
+```bash
+# macOS
+brew install rbenv ruby-build
+rbenv install 3.3.6
+rbenv global 3.3.6
+
+# Windows (WSL2 recommended — run these inside WSL)
+sudo apt update && sudo apt install -y rbenv ruby-build
+rbenv install 3.3.6
+rbenv global 3.3.6
+```
+
+Then install [DIP](https://github.com/bibendi/dip):
+
+```bash
+gem install dip
+```
+
+### First time setup
+
+Clone the repo and provision everything in one command:
 
 ```bash
 git clone https://github.com/CaelusC/ADA-Website.git
 cd ADA-Website
+dip provision
 ```
 
-Copy the env file:
+`dip provision` will:
+1. Copy `.env.example` to `.env`
+2. Build the Docker image
+3. Create and migrate the database
+
+Start the app:
 
 ```bash
-cp .env.example .env
+dip up
 ```
-
-Generate a secret key and paste it into `.env` as `SECRET_KEY_BASE`:
-
-```bash
-docker compose run --rm web rails secret
-```
-
-Start everything:
-
-```bash
-docker compose up --build
-```
-
-First run takes a few minutes while Docker pulls images and installs gems. After that it's fast.
 
 `localhost:3000`.
+
+---
 
 ## Daily workflow
 
 ```bash
-docker compose up          # Start the App
-docker compose down        # Stop everything
-docker compose down -v     # Stop and wipe the Database
+dip up                 # Start the app
+dip down               # Stop everything
+dip down volumes       # Stop and wipe the database
 ```
 
-Running Rails commands inside Docker:
+---
+
+## Running commands
+
+With DIP (recommended):
 
 ```bash
-docker compose run --rm web rails db:seed
-docker compose run --rm web rails generate model Thing name:string
-docker compose run --rm web rails console
+dip rails db:seed
+dip rails generate model Thing name:string
+dip rails console
+dip test
+dip rubocop
+dip rubocop fix
+dip brakeman
+```
+
+Without DIP:
+
+```bash
+docker compose run --rm web bundle exec rails db:seed
+docker compose run --rm web bundle exec rails test
+docker compose run --rm web bundle exec rubocop
+docker compose run --rm web bundle exec brakeman -q
 ```
 
 ---
@@ -64,25 +107,6 @@ Copy `.env.example` to `.env` and fill in the values. Never commit `.env`.
 | `POSTGRES_DB` | Database name |
 | `DATABASE_URL` | Full PostgreSQL connection string |
 | `RAILS_ENV` | Set to `development` locally |
-| `SECRET_KEY_BASE` | Run `rails secret` (output is the secret) |
-
----
-
-## Testing
-
-```bash
-docker compose run --rm web bundle exec rails test
-```
-
----
-
-## Linting and security
-
-```bash
-docker compose run --rm web bundle exec rubocop
-docker compose run --rm web bundle exec rubocop -a   # Auto fixes, use it with caution pliz
-docker compose run --rm web bundle exec brakeman -q
-```
 
 ---
 
@@ -94,6 +118,7 @@ docker compose run --rm web bundle exec brakeman -q
 | `develop` | Integration branch. All features merge here first |
 | `your-feature-branch` | Cut from **develop**, PR back into **develop** |
 
+---
 
 ## Stack
 
